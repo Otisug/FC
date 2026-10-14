@@ -1,0 +1,632 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Montserrat', sans-serif;
+  background-color: #030108;
+  color: #ffffff;
+}
+
+#space-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  overflow: hidden;
+}
+
+#nebula-bg {
+  position: absolute;
+  top: -5%;
+  left: -5%;
+  width: 110%;
+  height: 110%;
+  background-image: url('pictures/Galaxia 1.jpg');
+  background-size: cover;
+  background-position: center;
+  filter: saturate(1.2) contrast(1.05) brightness(0.95);
+  transition: background-image 0.8s ease-in-out, transform 0.15s ease-out;
+}
+
+#space-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Glassmorphism Reusable */
+.glass-box {
+  background: rgba(15, 10, 28, 0.85);
+  border: 1px solid rgba(234, 128, 252, 0.3);
+  border-radius: 20px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6);
+}
+
+/* --- Botón de Ajustes SOLO ÍCONO --- */
+.icon-only-btn {
+  position: fixed;
+  top: 25px;
+  right: 25px;
+  z-index: 20;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #e0e0e0;
+  background: rgba(18, 11, 31, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.icon-only-btn:hover {
+  background: rgba(35, 20, 60, 0.85);
+  border-color: rgba(234, 128, 252, 0.6);
+  color: #fff;
+  transform: rotate(30deg) scale(1.05);
+  box-shadow: 0 0 15px rgba(234, 128, 252, 0.4);
+}
+
+/* --- BARRA SUPERIOR (Mapa Estelar + Carta + Countdown) --- */
+.top-nav-bar {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  right: 80px;
+  z-index: 15;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+.top-nav-bar > * {
+  pointer-events: auto;
+}
+
+.star-map-widget {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+}
+
+.widget-icon { font-size: 1.3rem; }
+.widget-text { display: flex; flex-direction: column; }
+.widget-title { font-size: 0.65rem; letter-spacing: 1.5px; color: #ea80fc; font-weight: 600; }
+.widget-sub { font-size: 0.75rem; color: #e0d8f0; }
+
+.countdown-widget {
+  padding: 8px 16px;
+  text-align: right;
+}
+
+.countdown-timer {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #00e676;
+  letter-spacing: 1px;
+}
+
+/* --- BARRA DE ACCIONES RÁPIDAS INTERACTIVAS --- */
+.quick-actions-bar {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  gap: 10px;
+}
+
+.quick-btn {
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  color: #e0e0e0;
+  background: rgba(18, 11, 31, 0.75);
+  border: 1px solid rgba(234, 128, 252, 0.3);
+  border-radius: 20px;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+}
+
+.quick-btn:hover {
+  background: rgba(35, 20, 60, 0.9);
+  border-color: rgba(234, 128, 252, 0.8);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 0 12px rgba(234, 128, 252, 0.4);
+}
+
+/* Panel compacto con datos vivos del cielo */
+.sky-dashboard {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 9;
+  width: 320px;
+  max-height: calc(100vh - 230px);
+  overflow-y: auto;
+  padding: 16px 18px 14px;
+  border-color: rgba(178, 208, 225, 0.25);
+  border-radius: 16px;
+  color: #f2f1f7;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(178, 208, 225, 0.35) transparent;
+}
+
+.sky-dashboard-header,
+.wish-count-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sky-dashboard-header { margin-bottom: 14px; }
+.dashboard-kicker { display: block; color: #8fd8c1; font-size: 0.62rem; font-weight: 600; letter-spacing: 1.4px; }
+.sky-date { display: block; margin-top: 3px; color: #a7a5b6; font-size: 0.72rem; }
+.dashboard-minimize-btn { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid rgba(255,255,255,0.14); border-radius: 50%; background: rgba(255,255,255,0.06); color: #f2d28c; font-size: 1rem; cursor: pointer; }
+.sky-dashboard.collapsed .sky-dashboard-header { margin-bottom: 0; }
+.sky-dashboard.collapsed .constellation-widget,
+.sky-dashboard.collapsed .moon-widget,
+.sky-dashboard.collapsed .wish-wall-widget,
+.sky-dashboard.collapsed .featured-photo-widget { display: none; }
+.constellation-widget { display: grid; grid-template-columns: 38px 1fr; align-items: start; gap: 11px; padding-bottom: 13px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.constellation-symbol { display: grid; place-items: center; width: 34px; height: 34px; color: #f2d28c; font-size: 1.5rem; }
+.dashboard-label { display: block; color: #aaa8bc; font-size: 0.58rem; font-weight: 600; letter-spacing: 1px; }
+.constellation-widget h2 { margin: 3px 0 4px; color: #f1e6ff; font-size: 1.05rem; font-weight: 600; }
+.constellation-widget p { margin: 0; color: #d0ced9; font-size: 0.75rem; line-height: 1.45; }
+.moon-widget { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.moon-icon { color: #f4e8bb; font-size: 1.65rem; line-height: 1; }
+.moon-copy strong, .moon-illumination { display: block; }
+.moon-copy strong { margin-top: 3px; font-size: 0.78rem; font-weight: 500; }
+.moon-illumination { margin-top: 2px; color: #a7a5b6; font-size: 0.67rem; }
+.moon-next { max-width: 90px; color: #a7d7cb; font-size: 0.65rem; line-height: 1.35; text-align: right; }
+.wish-wall-widget { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.wish-count-line strong { color: #f2d28c; font-size: 1rem; font-weight: 600; }
+.wish-wall-widget p { margin: 6px 0 0; color: #e1ddea; font-size: 0.75rem; font-style: italic; line-height: 1.45; }
+.featured-photo-widget { padding-top: 12px; }
+.featured-photo-widget[hidden] { display: none; }
+.featured-photo-button { display: grid; grid-template-columns: 62px 1fr 18px; align-items: center; gap: 10px; width: 100%; padding: 0; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; }
+.featured-photo-button img { width: 62px; height: 48px; border-radius: 7px; object-fit: cover; background: rgba(255,255,255,0.06); }
+.featured-photo-copy { min-width: 0; }
+.featured-photo-copy strong { display: block; overflow: hidden; margin-top: 4px; font-size: 0.72rem; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.featured-photo-arrow { color: #8fd8c1; font-size: 1rem; }
+.featured-photo-button:hover .featured-photo-arrow { transform: translate(2px, -2px); }
+
+/* --- CARTA Y MODALES --- */
+.open-card-btn {
+  padding: 10px 24px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #ffffff;
+  background: rgba(18, 11, 31, 0.75);
+  border: 1px solid rgba(234, 128, 252, 0.4);
+  border-radius: 25px;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 20px rgba(234, 128, 252, 0.25);
+  transition: all 0.3s ease;
+}
+
+.open-card-btn:hover {
+  background: rgba(35, 20, 60, 0.9);
+  border-color: rgba(234, 128, 252, 0.8);
+  box-shadow: 0 0 25px rgba(234, 128, 252, 0.5);
+  transform: translateY(-2px);
+}
+
+.content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 20px;
+  pointer-events: none;
+}
+
+.birthday-card {
+  pointer-events: auto;
+  position: relative;
+  max-width: 520px;
+  padding: 35px 30px;
+  background: rgba(15, 10, 28, 0.85);
+  border: 1px solid rgba(234, 128, 252, 0.35);
+  border-radius: 24px;
+  backdrop-filter: blur(25px);
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(234, 128, 252, 0.2);
+  text-align: center;
+  isolation: isolate;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.birthday-card-content {
+  position: relative;
+  z-index: 2;
+}
+
+.birthday-card.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.9) translateY(20px);
+}
+
+.card-otter-decoration {
+  position: absolute;
+  font-size: 2.2rem;
+  animation: floatOtter 3s ease-in-out infinite alternate;
+}
+
+.card-otter-decoration.top-left { top: -20px; left: -15px; transform: rotate(-15deg); }
+.card-otter-decoration.top-right { top: -20px; right: -15px; transform: rotate(15deg); }
+
+@keyframes floatOtter {
+  0% { transform: translateY(0) rotate(-5deg); }
+  100% { transform: translateY(-10px) rotate(8deg); }
+}
+
+.close-card-btn {
+  position: absolute;
+  top: 15px;
+  right: 18px;
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  color: #ea80fc;
+  margin-bottom: 15px;
+  background: rgba(234, 128, 252, 0.1);
+  padding: 5px 14px;
+  border-radius: 15px;
+  border: 1px solid rgba(234, 128, 252, 0.2);
+}
+
+.birthday-card h2 {
+  font-size: 2.2rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  background: linear-gradient(135deg, #ffffff, #e1bee7);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.birthday-card p {
+  font-size: 0.95rem;
+  font-weight: 300;
+  line-height: 1.7;
+  color: #e0d8f0;
+  margin-bottom: 25px;
+}
+
+.action-btn {
+  padding: 12px 28px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: #fff;
+  background: linear-gradient(135deg, rgba(156, 39, 176, 0.8), rgba(103, 58, 183, 0.8));
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 25px;
+  cursor: pointer;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 0 15px rgba(156, 39, 176, 0.4);
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 25px rgba(156, 39, 176, 0.7);
+}
+
+/* --- MODALES REUTILIZABLES --- */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 30;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal-box {
+  position: relative;
+  width: 460px;
+  max-width: 90vw;
+  padding: 30px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 15px; right: 20px;
+  background: none; border: none;
+  color: #aaa; font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.modal-box h3 { margin-bottom: 10px; color: #ea80fc; }
+.modal-box p { font-size: 0.85rem; color: #cfd8dc; margin-bottom: 15px; }
+
+#wish-input {
+  width: 100%;
+  padding: 10px 15px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+  margin-bottom: 15px;
+  outline: none;
+}
+
+.saved-wishes-section { margin-top: 20px; text-align: left; }
+.saved-wishes-section h4 { font-size: 0.8rem; color: #ea80fc; margin-bottom: 8px; }
+.wishes-list { max-height: 120px; overflow-y: auto; font-size: 0.8rem; color: #e0d8f0; padding-left: 15px; }
+
+/* Galleta Fortuna */
+.planet-spinner { font-size: 3.5rem; margin: 15px 0; transition: transform 1s ease-out; }
+.text-center { text-align: center; }
+
+/* Galería de Fotos */
+.photos-box { width: 600px; }
+#photo-upload-input { display: none; }
+.upload-btn {
+  display: inline-block;
+  padding: 8px 18px;
+  background: rgba(234, 128, 252, 0.2);
+  border: 1px dashed #ea80fc;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  margin-bottom: 15px;
+}
+
+.photos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.photo-item {
+  display: block;
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.storage-status {
+  min-height: 1.2em;
+  margin: 8px 0;
+  color: #b8e9cb;
+  font-size: 0.78rem;
+}
+
+/* Reproductor Spotify */
+.spotify-banner {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 20;
+  width: 340px;
+  max-width: calc(100vw - 40px);
+  padding: 14px;
+  border: 1px solid rgba(143, 216, 193, 0.3);
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(15, 23, 30, 0.96), rgba(17, 11, 29, 0.94));
+  backdrop-filter: blur(20px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
+  transition: width 0.3s ease, padding 0.3s ease, border-color 0.3s ease;
+}
+
+.spotify-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.spotify-title { display: flex; align-items: center; gap: 11px; min-width: 0; }
+.spotify-mark { display: grid; place-items: center; flex: 0 0 38px; width: 38px; height: 38px; border-radius: 50%; background: #1db954; color: #102119; font-size: 1.5rem; font-weight: 600; }
+.spotify-copy { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.spotify-kicker { display: flex; align-items: center; gap: 7px; color: #a6c3b4; font-size: 0.58rem; font-weight: 600; letter-spacing: 1px; }
+.spotify-copy strong { overflow: hidden; color: #f2f1f7; font-size: 0.84rem; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+
+.pulse-indicator {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #1db954;
+  box-shadow: 0 0 8px rgba(29, 185, 84, 0.65);
+  animation: pulse 1.2s infinite alternate;
+}
+
+@keyframes pulse { 0% { transform: scale(0.8); } 100% { transform: scale(1.3); } }
+
+.minimize-btn {
+  display: grid;
+  place-items: center;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.spotify-expanded-content { display: block; margin-top: 13px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); }
+.spotify-expanded-heading { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; color: #c6c4d0; font-size: 0.7rem; }
+.spotify-service-label { color: #8fd8c1; font-size: 0.56rem; font-weight: 600; letter-spacing: 1px; }
+.spotify-expanded-content iframe { display: block; width: 100%; height: 180px; border: 0; border-radius: 10px; }
+.spotify-banner.minimized { width: 280px; padding: 10px 12px; }
+.spotify-banner:not(.minimized) { width: min(54vw, 640px); }
+.spotify-banner.minimized .spotify-expanded-content { display: none; }
+
+@media (max-width: 700px) {
+  .sky-dashboard {
+    right: 12px;
+    bottom: 82px;
+    width: min(320px, calc(100vw - 24px));
+    max-height: 38vh;
+    padding: 12px 14px;
+  }
+
+  .spotify-banner {
+    bottom: 12px;
+    left: 12px;
+    max-width: calc(100vw - 24px);
+  }
+
+  .spotify-banner.minimized { width: min(280px, calc(100vw - 24px)); }
+  .spotify-banner:not(.minimized) { width: min(640px, calc(100vw - 24px)); }
+  .spotify-banner:not(.minimized) .spotify-expanded-content iframe { height: min(180px, 32vh); }
+  body.spotify-player-open .sky-dashboard { display: none; }
+}
+
+/* Panel de Ajustes */
+.panel {
+  position: fixed;
+  top: 132px;
+  right: 24px;
+  z-index: 22;
+  width: min(320px, calc(100vw - 48px));
+  max-height: min(370px, calc(100vh - 160px));
+  overflow-y: auto;
+  padding: 18px;
+  scrollbar-width: none;
+  border: 1px solid rgba(234, 128, 252, 0.28);
+  border-radius: 16px;
+  background: rgba(15, 10, 28, 0.96);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.68);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.panel.hidden { opacity: 0; pointer-events: none; transform: translateY(20px); }
+.panel::-webkit-scrollbar { display: none; }
+.panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.panel-header h3 { font-size: 0.8rem; letter-spacing: 2px; color: #ea80fc; }
+.close-btn { background: none; border: none; color: #888; font-size: 1.4rem; cursor: pointer; }
+.control-group { margin-bottom: 12px; }
+.control-group label { display: block; font-size: 0.8rem; color: #b0bec5; margin-bottom: 6px; }
+.label-row { display: flex; justify-content: space-between; }
+.label-row span { font-size: 0.8rem; color: #ea80fc; font-weight: 600; }
+.galaxy-selector { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.galaxy-thumb { width: 100%; height: 44px; border-radius: 10px; background-size: cover; background-position: center; border: 2px solid transparent; cursor: pointer; }
+.galaxy-thumb.active { border-color: #ea80fc; box-shadow: 0 0 10px rgba(234, 128, 252, 0.6); }
+input[type="range"] { width: 100%; accent-color: #ea80fc; background: rgba(255, 255, 255, 0.1); height: 4px; border-radius: 2px; }
+.toggle-row { display: flex; justify-content: space-between; align-items: center; }
+
+@media (max-width: 700px) {
+  .panel {
+    top: 132px;
+    right: 12px;
+    width: min(320px, calc(100vw - 24px));
+  }
+}
+
+@media (max-height: 700px) {
+  .sky-dashboard { bottom: 12px; max-height: 28vh; }
+}
+
+@media (max-width: 700px) {
+  .top-nav-bar {
+    top: 12px;
+    left: 12px;
+    right: 64px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: "natal countdown" "letter letter";
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .star-map-widget {
+    grid-area: natal;
+    min-width: 0;
+    gap: 7px;
+    padding: 8px 9px;
+  }
+
+  .countdown-widget {
+    grid-area: countdown;
+    min-width: 0;
+    padding: 8px 9px;
+    text-align: left;
+  }
+
+  .open-card-btn {
+    grid-area: letter;
+    width: 100%;
+    min-width: 0;
+    padding: 8px 10px;
+    font-size: 0.72rem;
+  }
+
+  .widget-text { min-width: 0; }
+  .widget-title { font-size: 0.56rem; letter-spacing: 0.7px; }
+  .widget-sub { font-size: 0.6rem; }
+  .countdown-timer { font-size: 0.62rem; letter-spacing: 0; }
+
+  .quick-actions-bar {
+    top: 124px;
+    left: 12px;
+    right: 12px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: auto;
+    gap: 8px;
+    transform: none;
+    white-space: normal;
+  }
+
+  .quick-btn {
+    min-width: 0;
+    padding: 6px 4px;
+    font-size: 0.68rem;
+    white-space: nowrap;
+  }
+
+}

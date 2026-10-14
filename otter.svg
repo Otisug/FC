@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Nutria</title>
+  <circle cx="32" cy="32" r="30" fill="#10131d"/>
+  <circle cx="17" cy="19" r="8" fill="#895b46"/>
+  <circle cx="47" cy="19" r="8" fill="#895b46"/>
+  <circle cx="17" cy="19" r="3.5" fill="#d7a98b"/>
+  <circle cx="47" cy="19" r="3.5" fill="#d7a98b"/>
+  <ellipse cx="32" cy="34" rx="22" ry="23" fill="#895b46"/>
+  <ellipse cx="32" cy="40" rx="15" ry="12" fill="#f0d6b8"/>
+  <ellipse cx="24" cy="31" rx="2.2" ry="3" fill="#17151a"/>
+  <ellipse cx="40" cy="31" rx="2.2" ry="3" fill="#17151a"/>
+  <ellipse cx="32" cy="37" rx="4" ry="2.8" fill="#302027"/>
+  <path d="M32 40v4m0 0c-2 2-4 2-6 0m6 0c2 2 4 2 6 0" fill="none" stroke="#60413b" stroke-linecap="round" stroke-width="1.8"/>
+  <path d="M18 39l8 1m-8 3 8-1m20-3-8 1m8 3-8-1" fill="none" stroke="#895b46" stroke-linecap="round" stroke-width="1.2"/>
+</svg>

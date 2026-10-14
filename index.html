@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feliz Cumpleaños</title>
+  <link rel="icon" type="image/svg+xml" href="otter.svg">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Fondo dinámico -->
+  <div id="space-container">
+    <div id="nebula-bg"></div>
+    <canvas id="space-canvas"></canvas>
+  </div>
+
+  <!-- Botón de ajustes SOLO ÍCONO (Esquina superior derecha) -->
+  <button id="toggle-panel-btn" class="icon-only-btn" title="Ajustes del Fondo" aria-label="Abrir ajustes del fondo" aria-controls="controls-panel" aria-expanded="false">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="3"></circle>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+    </svg>
+  </button>
+
+  <!-- Panel flotante de control (Glassmorphism) -->
+  <aside id="controls-panel" class="panel hidden" aria-label="Ajustes del fondo">
+    <div class="panel-header">
+      <h3>✨ EFECTOS DINÁMICOS</h3>
+      <button id="close-panel-btn" class="close-btn" title="Cerrar ajustes" aria-label="Cerrar ajustes">&times;</button>
+    </div>
+
+    <div class="control-group">
+      <label>Seleccionar Galaxia</label>
+      <div class="galaxy-selector">
+        <button class="galaxy-thumb active" data-img="pictures/Galaxia 1.jpg" style="background-image: url('pictures/Galaxia 1.jpg');"></button>
+        <button class="galaxy-thumb" data-img="pictures/Galaxia 2.avif" style="background-image: url('pictures/Galaxia 2.avif');"></button>
+        <button class="galaxy-thumb" data-img="pictures/Galaxia 3.jpg" style="background-image: url('pictures/Galaxia 3.jpg');"></button>
+        <button class="galaxy-thumb" data-img="pictures/Galaxia 4.jpg" style="background-image: url('pictures/Galaxia 4.jpg');"></button>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="label-row">
+        <label for="star-count">Cantidad de Estrellas</label>
+        <span id="star-count-val">400</span>
+      </div>
+      <input type="range" id="star-count" min="100" max="800" value="400">
+    </div>
+
+    <div class="control-group">
+      <div class="label-row">
+        <label for="twinkle-speed">Velocidad de Parpadeo</label>
+        <span id="twinkle-speed-val">1.00x</span>
+      </div>
+      <input type="range" id="twinkle-speed" min="0.02" max="3.0" step="0.02" value="1.0">
+    </div>
+
+    <div class="control-group">
+      <div class="label-row">
+        <label for="brightness">Intensidad de Brillo</label>
+        <span id="brightness-val">100%</span>
+      </div>
+      <input type="range" id="brightness" min="30" max="150" value="100">
+    </div>
+
+    <div class="control-group toggle-row">
+      <label for="parallax-toggle">Movimiento Paralaje</label>
+      <input type="checkbox" id="parallax-toggle" checked>
+    </div>
+  </aside>
+
+  <!-- 1. CONTADOR DE CUMPLEAÑOS Y 6. MAPA DE ESTRELLAS (Barra Superior) -->
+  <div class="top-nav-bar">
+    <!-- 6. Mapa Estelar del Día que Nació (Esquina Superior Izquierda) -->
+    <div class="star-map-widget glass-box">
+      <span class="widget-icon">🌌</span>
+      <div class="widget-text">
+        <span class="widget-title">CIELO NATAL</span>
+        <span class="widget-sub">31/10/2004 • Escorpio ♏</span>
+      </div>
+    </div>
+
+    <!-- Carta Minimizada Superior -->
+    <button id="open-card-btn" class="open-card-btn">🦦 Cartita 🦦</button>
+
+    <!-- 1. Contador de Cumpleaños Flotante -->
+    <div class="countdown-widget glass-box">
+      <span class="widget-title">PRÓXIMO CUMPLE</span>
+      <div id="countdown-timer" class="countdown-timer">00d 00h 00m 00s</div>
+    </div>
+  </div>
+
+  <!-- BARRA DE HERRAMIENTAS INTERACTIVAS (Barra Superior Flotante) -->
+  <div class="quick-actions-bar">
+    <button id="btn-wish" class="quick-btn" title="Pedir un deseo">🌠 Pedir Deseo</button>
+    <button id="btn-fortune" class="quick-btn" title="Galleta astronómica">🪐 Mi Suerte</button>
+    <button id="btn-photos" class="quick-btn" title="Mis Recuerdos">📸 Mis Fotos</button>
+    
+    <!-- Lanzador de fuegos artificiales -->
+    <button id="btn-celebrate" class="quick-btn" title="¡Celebrar!">🚀 ¡Celebrar! ✨</button>
+  </div>
+
+  <aside id="sky-dashboard" class="sky-dashboard glass-box" aria-label="Resumen del cielo">
+    <div class="sky-dashboard-header">
+      <div>
+        <span class="dashboard-kicker">CIELO DE HOY</span>
+        <span id="sky-date" class="sky-date"></span>
+      </div>
+      <button id="toggle-dashboard-btn" class="dashboard-minimize-btn" title="Minimizar Cielo de hoy" aria-label="Minimizar Cielo de hoy" aria-expanded="true">−</button>
+    </div>
+
+    <section class="constellation-widget">
+      <span class="constellation-symbol" aria-hidden="true">✧</span>
+      <div>
+        <span class="dashboard-label">CONSTELACIÓN DEL DÍA</span>
+        <h2 id="daily-constellation">Orión</h2>
+        <p id="constellation-fact"></p>
+      </div>
+    </section>
+
+    <section class="moon-widget" aria-label="Fase lunar actual">
+      <span id="moon-icon" class="moon-icon" aria-hidden="true">🌒</span>
+      <div class="moon-copy">
+        <span class="dashboard-label">FASE LUNAR</span>
+        <strong id="moon-phase">Luna creciente</strong>
+        <span id="moon-illumination" class="moon-illumination"></span>
+      </div>
+      <span id="moon-next" class="moon-next"></span>
+    </section>
+
+    <section class="wish-wall-widget">
+      <div class="wish-count-line">
+        <span class="dashboard-label">DESEOS COMPARTIDOS</span>
+        <strong id="wish-count">0</strong>
+      </div>
+      <p id="featured-wish">El universo espera el primer deseo.</p>
+    </section>
+
+    <section id="featured-photo-widget" class="featured-photo-widget" hidden>
+      <button id="featured-photo-button" class="featured-photo-button" type="button" title="Abrir galería de fotos">
+        <img id="featured-photo" alt="Recuerdo destacado">
+        <span class="featured-photo-copy">
+          <span class="dashboard-label">RECUERDO ESTELAR</span>
+          <strong id="featured-photo-name">Abrir galería</strong>
+        </span>
+        <span class="featured-photo-arrow" aria-hidden="true">↗</span>
+      </button>
+    </section>
+  </aside>
+
+  <!-- Modal / Carta de Cumpleaños en el Centro -->
+  <main class="content">
+    <div id="birthday-card" class="birthday-card hidden">
+      <div class="birthday-card-content">
+        <button id="close-card-btn" class="close-card-btn" title="Ocultar carta">&times;</button>
+
+        <div class="card-otter-decoration top-left">🦦</div>
+        <div class="card-otter-decoration top-right">🦦</div>
+
+        <div class="badge">🎂 FELIZ CUMPLEAÑOS</div>
+        <h2>¡Feliz Cumpleaños! 🎉</h2>
+        <p>Que este nuevo año alrededor del sol esté lleno de momentos mágicos, música increíble e infinitas posibilidades. ¡Espero que disfrutes mucho de este viaje espacial hecho especialmente para vos! 🦦✨</p>
+        <button id="hide-card-action" class="action-btn">Explorar el Universo ✨</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- 2. MODAL PEDIR UN DESEO -->
+  <div id="wish-modal" class="modal-overlay hidden">
+    <div class="modal-box glass-box">
+      <button class="modal-close" id="close-wish-modal">&times;</button>
+      <h3>🌠 Pide un Deseo a las Estrellas</h3>
+      <p>Escribe tu deseo. Una estrella fugaz lo llevará al universo y se compartirá en la página.</p>
+      <input type="text" id="wish-input" placeholder="Escribe tu deseo aquí..." maxlength="120">
+      <button id="submit-wish-btn" class="action-btn">Lanzar al Universo ✨</button>
+      <p id="wish-status" class="storage-status" aria-live="polite"></p>
+      
+      <div class="saved-wishes-section">
+        <h4>Tus Deseos Guardados:</h4>
+        <ul id="wishes-list" class="wishes-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. MODAL GALLETA DE LA FORTUNA ASTRONÓMICA -->
+  <div id="fortune-modal" class="modal-overlay hidden">
+    <div class="modal-box glass-box text-center">
+      <button class="modal-close" id="close-fortune-modal">&times;</button>
+      <h3>🪐 Tu Fortuna Cósmica</h3>
+      <div id="planet-spinner" class="planet-spinner">🪐</div>
+      <p id="fortune-text" class="fortune-text">Haz clic abajo para girar el planeta y descubrir tu predicción para este año.</p>
+      <button id="spin-fortune-btn" class="action-btn">Girar Planeta ✨</button>
+    </div>
+  </div>
+
+  <!-- 3. MODAL RECUERDOS / FOTOS SUBIDAS -->
+  <div id="photos-modal" class="modal-overlay hidden">
+    <div class="modal-box glass-box photos-box">
+      <button class="modal-close" id="close-photos-modal">&times;</button>
+      <h3>📸 Galería de Memorias Cósmicas</h3>
+      <p>Sube tus fotos favoritas para compartirlas en la galería.</p>
+      
+      <label for="photo-upload-input" class="upload-btn">➕ Subir Nueva Foto</label>
+      <input type="file" id="photo-upload-input" accept="image/*" class="hidden">
+      <p id="photos-status" class="storage-status" aria-live="polite"></p>
+
+      <div id="photos-grid" class="photos-grid"></div>
+    </div>
+  </div>
+
+  <!-- Banner de Spotify Plegable (Esquina Inferior Izquierda) -->
+  <div id="spotify-banner" class="spotify-banner minimized">
+    <div class="spotify-header">
+      <div class="spotify-title">
+        <span class="spotify-mark" aria-hidden="true">♫</span>
+        <span class="spotify-copy">
+          <span class="spotify-kicker"><span class="pulse-indicator"></span> SONIDO EN ÓRBITA</span>
+          <strong>Playlist especial</strong>
+        </span>
+      </div>
+      <button id="toggle-spotify-btn" class="minimize-btn" title="Expandir reproductor" aria-label="Expandir reproductor" aria-expanded="false">+</button>
+    </div>
+
+    <div class="spotify-expanded-content">
+      <div class="spotify-expanded-heading">
+        <span>Una banda sonora para este viaje</span>
+        <span class="spotify-service-label">SPOTIFY</span>
+      </div>
+      <iframe title="Playlist especial de Spotify" src="https://open.spotify.com/embed/playlist/5sa3KrCnqZoN3GTAxRKWiz?utm_source=generator&theme=0" width="100%" height="180" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
