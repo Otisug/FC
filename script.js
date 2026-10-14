@@ -14,7 +14,7 @@ import {
   getDownloadURL,
   getStorage,
   ref,
-  uploadBytes
+  uploadBytesResumable
 } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-storage.js';
 
 const firebaseConfig = {
@@ -337,14 +337,32 @@ photoUploadInput.addEventListener('change', async event => {
     return;
   }
 
-  photosStatus.textContent = 'Subiendo imagen...';
+  photosStatus.textContent = 'Preparando subida...';
   const safeName = file.name.replace(/[^\w.-]/g, '_');
   const imageRef = ref(storage, `birthday-photos/${Date.now()}-${safeName}`);
+  const uploadTask = uploadBytesResumable(imageRef, file, { contentType: file.type });
   let uploaded = false;
+  let uploadTimedOut = false;
+  let uploadTimeout;
+
   try {
-    await uploadBytes(imageRef, file, { contentType: file.type });
+    await new Promise((resolve, reject) => {
+      uploadTimeout = setTimeout(() => {
+        uploadTimedOut = true;
+        uploadTask.cancel();
+        reject(new Error('photo-upload-timeout'));
+      }, 60000);
+
+      uploadTask.on('state_changed', snapshot => {
+        const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+        photosStatus.textContent = `Subiendo imagen... ${progress}%`;
+      }, reject, resolve);
+    });
+    clearTimeout(uploadTimeout);
     uploaded = true;
+    photosStatus.textContent = 'Preparando la imagen para la galería...';
     const url = await getDownloadURL(imageRef);
+    photosStatus.textContent = 'Guardando en la galería...';
     await addDoc(photosCollection, {
       url,
       storagePath: imageRef.fullPath,
@@ -352,10 +370,16 @@ photoUploadInput.addEventListener('change', async event => {
       createdAt: serverTimestamp()
     });
     photosStatus.textContent = 'Imagen compartida con éxito.';
-    photoUploadInput.value = '';
   } catch (error) {
+    clearTimeout(uploadTimeout);
     if (uploaded) await deleteObject(imageRef).catch(() => {});
-    showFirebaseError(photosStatus, error);
+    if (uploadTimedOut) {
+      photosStatus.textContent = 'La subida no respondió en 60 s. Comprueba tu conexión y que Firebase Storage esté habilitado.';
+    } else {
+      showFirebaseError(photosStatus, error);
+    }
+  } finally {
+    photoUploadInput.value = '';
   }
 });
 
@@ -550,12 +574,14 @@ toggleSpotifyBtn.addEventListener('click', () => {
 
 togglePanelBtn.addEventListener('click', () => {
   const isHidden = controlsPanel.classList.toggle('hidden');
+  document.body.classList.toggle('settings-panel-open', !isHidden);
   togglePanelBtn.setAttribute('aria-expanded', String(!isHidden));
   togglePanelBtn.setAttribute('aria-label', isHidden ? 'Abrir ajustes del fondo' : 'Cerrar ajustes del fondo');
 });
 
 closePanelBtn.addEventListener('click', () => {
   controlsPanel.classList.add('hidden');
+  document.body.classList.remove('settings-panel-open');
   togglePanelBtn.setAttribute('aria-expanded', 'false');
   togglePanelBtn.setAttribute('aria-label', 'Abrir ajustes del fondo');
 });
